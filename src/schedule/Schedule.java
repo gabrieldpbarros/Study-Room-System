@@ -2,7 +2,6 @@ package schedule;
 import interfaces.IPolicyStrategy;
 import interfaces.ISchedule;
 import observers.User;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,14 +25,14 @@ public class Schedule implements ISchedule {
     }
 
     @Override
+    public void removeReservation(String date, int time, User user) {
+        var dailySchedule = this.calendar.get(date);
+        dailySchedule.remove(time);
+    }
+
+    @Override
     public boolean requestReservation(String date, int time, User user, IPolicyStrategy policy) {
         var occupant = this.getOccupantAt(date, time);
-
-        if (occupant == null || policy.canReserve(user, occupant)) {
-            this.insertReservation(date, time, user);
-            return true;
-        }
-
-        return false;
+        return occupant == null || policy.canReserve(user, occupant);
     }
 }
