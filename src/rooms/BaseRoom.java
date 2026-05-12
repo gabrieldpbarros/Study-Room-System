@@ -16,9 +16,9 @@ abstract public class BaseRoom {
         this.observers.remove(observer);
     }
 
-    protected void notifyObservers(String tipoSala) {
+    protected void notifyObservers(String roomType) {
         for (IObserver observer : this.observers)
-            observer.update(tipoSala, "placeholder",this.id);
+            observer.update(roomType, "placeholder",this.id);
     }
 
     abstract String getStatus();
