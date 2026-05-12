@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 abstract public class BaseSala {
-    protected int ID;
+    protected int id;
     protected List<IObserver> observers;
     protected Map<String, Map<Integer, IObserver>> schedule;
 
