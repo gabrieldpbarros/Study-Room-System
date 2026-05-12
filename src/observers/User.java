@@ -7,8 +7,10 @@ public class User implements IObserver {
     private String role;
 
     public int getId() {
-        return 0;
+        return this.id;
     }
+
+    public String getRole() { return this.role; }
 
     @Override
     public void update(String roomType, String period, int id) {
