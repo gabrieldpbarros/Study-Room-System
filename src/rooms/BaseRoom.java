@@ -18,7 +18,7 @@ abstract public class BaseRoom {
         this.schedule = new Schedule();
     }
 
-    protected void notifyObservers(String roomType) {
+    protected void notifyObservers(String roomType, String procedure) {
         for (IObserver observer : this.observers)
             observer.update(roomType, "placeholder",this.id);
     }
@@ -40,7 +40,27 @@ abstract public class BaseRoom {
     }
 
     public boolean addReservation(String date, int time, User user, IPolicyStrategy policy) {
-        return this.schedule.requestReservation(date, time, user, policy);
+        var currentOccupant = schedule.getOccupantAt(date, time);
+        if (schedule.requestReservation(date, time, user, policy)) {
+            if (currentOccupant != null) {
+                // something
+            }
+
+            this.schedule.insertReservation(date, time, user);
+            //this.notifyObservers();
+            return true;
+        }
+        return false;
+    }
+
+    public boolean cancelReservation(String date, int time, User user) {
+        var currentOccupant = this.schedule.getOccupantAt(date, time);
+        if (currentOccupant.equals(user)) {
+            this.schedule.removeReservation(date, time, user);
+            //this.notifyObservers();
+            return true;
+        }
+        return false;
     }
 
     abstract String getStatus();
