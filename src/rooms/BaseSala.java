@@ -16,9 +16,9 @@ abstract public class BaseSala {
         this.observers.remove(observer);
     }
 
-    protected void notifyObservers() {
+    protected void notifyObservers(String tipoSala) {
         for (IObserver observer : this.observers)
-            observer.update();
+            observer.update(tipoSala, "placeholder",this.id);
     }
 
     abstract String getStatus();
