@@ -1,4 +1,9 @@
 package observers;
+import interfaces.IObserver;
 
-public class Report {
+public class Report implements IObserver {
+    @Override
+    public void update() {
+
+    }
 }
