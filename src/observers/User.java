@@ -6,8 +6,18 @@ public class User implements IObserver {
     private String name;
     private String role;
 
+    public User(int id, String name, String role) {
+        this.setId(id);
+        this.name = name;
+        this.role = role;
+    }
+
     public int getId() {
         return this.id;
+    }
+
+    public void setId(int newId) {
+        this.id = newId;
     }
 
     public String getRole() { return this.role; }
