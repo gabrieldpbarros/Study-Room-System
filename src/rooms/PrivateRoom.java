@@ -1,6 +1,6 @@
 package rooms;
 
-public class SalaIndividual extends BaseSala {
+public class PrivateRoom extends BaseRoom {
     @Override
     String getStatus() {
         return "";

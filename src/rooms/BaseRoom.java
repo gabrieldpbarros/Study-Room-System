@@ -3,7 +3,7 @@ import interfaces.IObserver;
 import java.util.List;
 import java.util.Map;
 
-abstract public class BaseSala {
+abstract public class BaseRoom {
     protected int id;
     protected List<IObserver> observers;
     protected Map<String, Map<Integer, IObserver>> schedule;

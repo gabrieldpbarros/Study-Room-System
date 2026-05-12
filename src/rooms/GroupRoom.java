@@ -1,6 +1,8 @@
 package rooms;
 
-public class SalaLab extends BaseSala {
+public class GroupRoom extends BaseRoom {
+    private String roomType = "Sala para grupos";
+
     @Override
     String getStatus() {
         return "";
