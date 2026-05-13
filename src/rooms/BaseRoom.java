@@ -1,4 +1,6 @@
 package rooms;
+import events.NotificationEvent;
+import interfaces.INotificationEvent;
 import interfaces.IObserver;
 import interfaces.IPolicyStrategy;
 import interfaces.ISchedule;
@@ -18,48 +20,20 @@ abstract public class BaseRoom {
         this.schedule = new Schedule();
     }
 
-    protected void notifyObservers(String roomType) {
+    protected void notifyObservers(INotificationEvent event) {
         for (IObserver observer : this.observers)
-            observer.update(roomType, "placeholder", this.id);
+            observer.update(event);
     }
 
-    // Sobrecarga 1
-    protected void notifyObservers(String roomType, String procedure, User specificUser) {
-        for (IObserver observer : this.observers) {
-            if (!observer.equals(specificUser)) {
-                observer.update(roomType, "placeholder", this.id);
-            } else {
-                // something
-                if (procedure.equals("RESERVA")) {
-                    observer.update(roomType, "placeholder", this.id);
-                } else if (procedure.equals("CANCELAMENTO")) {
-
-                }
-            }
-        }
-    }
-
-    // Sobrecarga 2
-    protected void notifyObservers(String roomType, String procedure, User previous, User current) {
-        for (IObserver observer : this.observers) {
-            if (observer.equals(previous)) {
-                // lost
-            } else if (observer.equals(current)) {
-                // reserved
-            } else
-                observer.update(roomType, "placeholder", this.id);
-        }
-    }
-
-    protected void parseNotification(User previousOccupant, User newOccupant) {
+    protected void parseNotification(User previousOccupant, User newOccupant, String date, int time) {
+        INotificationEvent event;
         if (previousOccupant == null)
-            this.notifyObservers(this.getRoomType(), "RESERVA", newOccupant);
+            event = new NotificationEvent(this.getRoomType(), this.id, date, time, "RESERVA", previousOccupant, newOccupant);
         else if (newOccupant == null)
-            this.notifyObservers(this.getRoomType(), "CANCELAMENTO", previousOccupant);
-        else if (!previousOccupant.equals(newOccupant))
-            this.notifyObservers(this.getRoomType(), "SOBRESCRITA", previousOccupant, newOccupant);
+            event = new NotificationEvent(this.getRoomType(), this.id, date, time, "CANCELAMENTO", previousOccupant, newOccupant);
         else
-            this.notifyObservers(this.getRoomType());
+            event = new NotificationEvent(this.getRoomType(), this.id, date, time, "SOBRESCRITA", previousOccupant, newOccupant);
+        this.notifyObservers(event);
 
     }
 
@@ -87,10 +61,9 @@ abstract public class BaseRoom {
         var currentOccupant = schedule.getOccupantAt(date, time);
         if (schedule.requestReservation(date, time, user, policy)) {
             this.schedule.insertReservation(date, time, user);
-            this.parseNotification(currentOccupant, user); // currentOccupant == null
+            this.parseNotification(currentOccupant, user, date, time); // currentOccupant == null
             return true;
         }
-        this.parseNotification(currentOccupant, currentOccupant);
         return false;
     }
 
@@ -98,7 +71,7 @@ abstract public class BaseRoom {
         var currentOccupant = this.schedule.getOccupantAt(date, time);
         if (user.equals(currentOccupant)) {
             this.schedule.removeReservation(date, time, user);
-            this.parseNotification(currentOccupant, null);
+            this.parseNotification(currentOccupant, null, date, time);
             return true;
         }
         return false;
