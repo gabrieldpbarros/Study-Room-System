@@ -2,6 +2,9 @@ package schedule;
 import interfaces.IPolicyStrategy;
 import interfaces.ISchedule;
 import observers.User;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,5 +37,22 @@ public class Schedule implements ISchedule {
     public boolean requestReservation(String date, int time, User user, IPolicyStrategy policy) {
         var occupant = this.getOccupantAt(date, time);
         return occupant == null || policy.canReserve(user, occupant);
+    }
+
+    @Override
+    public boolean isFullWithin(String begin, String end){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDate dateBegin = LocalDate.parse(begin, formatter);
+        LocalDate dateEnd = LocalDate.parse(end, formatter);
+
+        int beginYear = dateBegin.getYear();
+        int beginMonth = dateBegin.getMonthValue();
+        int beginDay = dateBegin.getDayOfMonth();
+
+        int endYear = dateEnd.getYear();
+        int endMonth = dateEnd.getMonthValue();
+        int endDay = dateEnd.getDayOfMonth();
+
+        return false;
     }
 }

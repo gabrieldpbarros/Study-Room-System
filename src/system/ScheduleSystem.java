@@ -1,10 +1,10 @@
 package system;
 import interfaces.IPolicyStrategy;
+import interfaces.ISchedule;
 import interfaces.IScheduleSystem;
 import observers.User;
 import rooms.BaseRoom;
 import rooms.GroupRoom;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -20,9 +20,9 @@ public class ScheduleSystem implements IScheduleSystem {
     }
 
     @Override
-    public void newUser() {
+    public void newUser(String username, String role) {
         int userId = userList.size();
-        User myUser = new User();
+        User myUser = new User(userId, username, role);
         userList.add(myUser);
         out.print("Criacao de Sala Realizada Com Sucesso!");
     }
@@ -67,13 +67,31 @@ public class ScheduleSystem implements IScheduleSystem {
     }
 
     @Override
-    public void getFreeRooms() {
+    public HashMap<Integer, BaseRoom> getFreeRooms(String begin, int timeStart, String end, int timeEnd) {
+        HashMap<Integer, BaseRoom> emptyRooms = new HashMap<>();
+        roomHash.forEach((id, room) -> {
+            ISchedule schedule = room.getSchedule();
+            boolean isFull = schedule.isFullWithin(begin, end);
+            if(isFull) return;
+            int roomId = 1; //room.getId();
+            emptyRooms.put(roomId, room);
+        });
 
+        return emptyRooms;
     }
 
     @Override
-    public void getBusyRooms() {
+    public HashMap<Integer, BaseRoom> getBusyRooms(String begin, int timeStart, String end, int timeEnd) {
+        HashMap<Integer, BaseRoom> emptyRooms = new HashMap<>();
+        roomHash.forEach((id, room) -> {
+            ISchedule schedule = room.getSchedule();
+            boolean isFull = schedule.isFullWithin(begin, end);
+            if(!isFull) return;
+            int roomId = 1; //room.getId();
+            emptyRooms.put(roomId, room);
+        });
 
+        return emptyRooms;
     }
 
     @Override
