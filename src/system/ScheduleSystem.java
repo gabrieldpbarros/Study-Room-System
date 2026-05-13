@@ -7,6 +7,8 @@ import rooms.BaseRoom;
 import rooms.GroupRoom;
 import java.util.ArrayList;
 import java.util.HashMap;
+import factories.RoomFactory;
+import factories.UserFactory;
 
 import static java.lang.System.out;
 
@@ -14,7 +16,6 @@ public class ScheduleSystem implements IScheduleSystem {
     private IPolicyStrategy systemPolicy;
     private ArrayList<User> userList = new ArrayList<>();
     private HashMap<Integer, BaseRoom> roomHash = new HashMap<>();
-
     private ScheduleSystem(){}
     private static ScheduleSystem instance;
 
@@ -33,20 +34,20 @@ public class ScheduleSystem implements IScheduleSystem {
     @Override
     public void newUser(String username, String role) {
         int userId = userList.size();
-        User myUser = new User(userId, username, role);
+        User myUser = UserFactory.createUser(userId, username, role);
         userList.add(myUser);
         out.print("Criacao de Sala Realizada Com Sucesso!");
     }
 
     @Override
-    public void newRoom(int roomId) {
+    public void newRoom(int roomId, int roomType) {
         BaseRoom targetRoom = roomHash.get(roomId);
         if(targetRoom!= null){
             out.print("Criacao de Sala Fracassou: Duplicata Presente");
             return;
         }
 
-        GroupRoom myRoom = new GroupRoom(roomId); // factory entra possivelmente aqui (?)
+        BaseRoom myRoom = RoomFactory.createRoom(roomId, roomType);
         roomHash.put(roomId, myRoom);
         out.print("Criacao de Sala Realizada Com Sucesso!");
     }
