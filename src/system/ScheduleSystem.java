@@ -36,7 +36,7 @@ public class ScheduleSystem implements IScheduleSystem {
         int userId = userList.size();
         User myUser = UserFactory.createUser(userId, username, role);
         userList.add(myUser);
-        out.print("Criacao de Sala Realizada Com Sucesso!");
+        out.print("Criacao de Usuario Realizada Com Sucesso!");
     }
 
     @Override
