@@ -14,6 +14,17 @@ public class ScheduleSystem implements IScheduleSystem {
     private IPolicyStrategy systemPolicy;
     private ArrayList<User> userList = new ArrayList<>();
     private HashMap<Integer, BaseRoom> roomHash = new HashMap<>();
+
+    private ScheduleSystem(){}
+    private static ScheduleSystem instance;
+
+    public static ScheduleSystem getInstance(){
+        if(instance == null){
+            instance = new ScheduleSystem();
+        }
+        return instance;
+    }
+
     @Override
     public void setPolicy(IPolicyStrategy newPolicy) {
         systemPolicy = newPolicy;
@@ -67,35 +78,31 @@ public class ScheduleSystem implements IScheduleSystem {
     }
 
     @Override
-    public HashMap<Integer, BaseRoom> getFreeRooms(String begin, int timeStart, String end, int timeEnd) {
+    public HashMap<Integer, BaseRoom> getRooms(String begin, String end, boolean fullOnly) {
         HashMap<Integer, BaseRoom> emptyRooms = new HashMap<>();
-        roomHash.forEach((id, room) -> {
+        for (BaseRoom room : roomHash.values()) {
             ISchedule schedule = room.getSchedule();
             boolean isFull = schedule.isFullWithin(begin, end);
-            if(isFull) return;
-            int roomId = 1; //room.getId();
+            if ((!fullOnly && isFull) || (fullOnly && !isFull)) continue;
+            int roomId = room.getId();
             emptyRooms.put(roomId, room);
-        });
+        }
 
         return emptyRooms;
     }
 
     @Override
-    public HashMap<Integer, BaseRoom> getBusyRooms(String begin, int timeStart, String end, int timeEnd) {
-        HashMap<Integer, BaseRoom> emptyRooms = new HashMap<>();
-        roomHash.forEach((id, room) -> {
-            ISchedule schedule = room.getSchedule();
-            boolean isFull = schedule.isFullWithin(begin, end);
-            if(!isFull) return;
-            int roomId = 1; //room.getId();
-            emptyRooms.put(roomId, room);
-        });
+    public void reportRooms(String begin, String end, boolean fullOnly) {
+        HashMap<Integer, BaseRoom> emptyRooms = getRooms(begin, end, fullOnly);
+        String criteriaStr = fullOnly ? "cheias" : "vazias";
+        if(emptyRooms.isEmpty()){
+            out.printf("Nao existem salas " + criteriaStr + " para o periodo selecionado.");
+            return;
+        };
 
-        return emptyRooms;
-    }
-
-    @Override
-    public void reportRooms() {
-
+        out.print("As salas disponiveis sao:");
+        for(BaseRoom room : roomHash.values()){
+            out.printf("Sala " + room.getId());
+        }
     }
 }

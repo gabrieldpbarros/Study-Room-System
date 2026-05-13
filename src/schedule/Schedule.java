@@ -45,14 +45,19 @@ public class Schedule implements ISchedule {
         LocalDate dateBegin = LocalDate.parse(begin, formatter);
         LocalDate dateEnd = LocalDate.parse(end, formatter);
 
-        int beginYear = dateBegin.getYear();
-        int beginMonth = dateBegin.getMonthValue();
-        int beginDay = dateBegin.getDayOfMonth();
+        boolean isFull = true;
 
-        int endYear = dateEnd.getYear();
-        int endMonth = dateEnd.getMonthValue();
-        int endDay = dateEnd.getDayOfMonth();
+        for (Map.Entry<String, Map<Integer, User>> entry : calendar.entrySet()) {
+            String scheduleDate = entry.getKey();
+            LocalDate myDate = LocalDate.parse(scheduleDate, formatter);
+            boolean isInside = !myDate.isBefore(dateBegin) && !myDate.isAfter(dateEnd);
 
-        return false;
+            if (isInside && entry.getValue().size()<24) {
+                isFull = false;
+                break;
+            }
+        }
+
+        return isFull;
     }
 }
