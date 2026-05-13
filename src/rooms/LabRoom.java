@@ -10,17 +10,7 @@ public class LabRoom extends BaseRoom {
     }
 
     @Override
-    void parseNotification(User previousOccupant, User newOccupant) {
-
-    }
-
-    @Override
-    String getStatus() {
-        return "";
-    }
-
-    @Override
-    void setStatus(String newStatus) {
-
+    String getRoomType() {
+        return this.roomType;
     }
 }
