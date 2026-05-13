@@ -7,6 +7,8 @@ import rooms.BaseRoom;
 import rooms.GroupRoom;
 import java.util.ArrayList;
 import java.util.HashMap;
+import factories.RoomFactory;
+import factories.UserFactory;
 
 import static java.lang.System.out;
 
@@ -14,6 +16,16 @@ public class ScheduleSystem implements IScheduleSystem {
     private IPolicyStrategy systemPolicy;
     private ArrayList<User> userList = new ArrayList<>();
     private HashMap<Integer, BaseRoom> roomHash = new HashMap<>();
+    private ScheduleSystem(){}
+    private static ScheduleSystem instance;
+
+    public static ScheduleSystem getInstance(){
+        if(instance == null){
+            instance = new ScheduleSystem();
+        }
+        return instance;
+    }
+
     @Override
     public void setPolicy(IPolicyStrategy newPolicy) {
         systemPolicy = newPolicy;
@@ -22,20 +34,20 @@ public class ScheduleSystem implements IScheduleSystem {
     @Override
     public void newUser(String username, String role) {
         int userId = userList.size();
-        User myUser = new User(userId, username, role);
+        User myUser = UserFactory.createUser(userId, username, role);
         userList.add(myUser);
         out.print("Criacao de Sala Realizada Com Sucesso!");
     }
 
     @Override
-    public void newRoom(int roomId) {
+    public void newRoom(int roomId, int roomType) {
         BaseRoom targetRoom = roomHash.get(roomId);
         if(targetRoom!= null){
             out.print("Criacao de Sala Fracassou: Duplicata Presente");
             return;
         }
 
-        GroupRoom myRoom = new GroupRoom(roomId); // factory entra possivelmente aqui (?)
+        BaseRoom myRoom = RoomFactory.createRoom(roomId, roomType);
         roomHash.put(roomId, myRoom);
         out.print("Criacao de Sala Realizada Com Sucesso!");
     }
@@ -67,35 +79,31 @@ public class ScheduleSystem implements IScheduleSystem {
     }
 
     @Override
-    public HashMap<Integer, BaseRoom> getFreeRooms(String begin, int timeStart, String end, int timeEnd) {
+    public HashMap<Integer, BaseRoom> getRooms(String begin, String end, boolean fullOnly) {
         HashMap<Integer, BaseRoom> emptyRooms = new HashMap<>();
-        roomHash.forEach((id, room) -> {
+        for (BaseRoom room : roomHash.values()) {
             ISchedule schedule = room.getSchedule();
             boolean isFull = schedule.isFullWithin(begin, end);
-            if(isFull) return;
-            int roomId = 1; //room.getId();
+            if ((!fullOnly && isFull) || (fullOnly && !isFull)) continue;
+            int roomId = room.getId();
             emptyRooms.put(roomId, room);
-        });
+        }
 
         return emptyRooms;
     }
 
     @Override
-    public HashMap<Integer, BaseRoom> getBusyRooms(String begin, int timeStart, String end, int timeEnd) {
-        HashMap<Integer, BaseRoom> emptyRooms = new HashMap<>();
-        roomHash.forEach((id, room) -> {
-            ISchedule schedule = room.getSchedule();
-            boolean isFull = schedule.isFullWithin(begin, end);
-            if(!isFull) return;
-            int roomId = 1; //room.getId();
-            emptyRooms.put(roomId, room);
-        });
+    public void reportRooms(String begin, String end, boolean fullOnly) {
+        HashMap<Integer, BaseRoom> emptyRooms = getRooms(begin, end, fullOnly);
+        String criteriaStr = fullOnly ? "cheias" : "vazias";
+        if(emptyRooms.isEmpty()){
+            out.printf("Nao existem salas " + criteriaStr + " para o periodo selecionado.");
+            return;
+        };
 
-        return emptyRooms;
-    }
-
-    @Override
-    public void reportRooms() {
-
+        out.print("As salas disponiveis sao:");
+        for(BaseRoom room : roomHash.values()){
+            out.printf("Sala " + room.getId());
+        }
     }
 }
